@@ -35,6 +35,8 @@ This document tracks the technical state of the Rejara mobile foundation (SCRUM-
 - [x] **Code Quality & Verification**:
   - ESLint 9 configured via `eslint-config-expo`. Verified 0 errors and 0 warnings.
   - Prettier formatting configured and verified across all files.
+  - **Biome (`@biomejs/biome`) configured** (`biome.json`) for sub-millisecond linting, formatting, and import organization.
+  - **Lefthook configured** (`lefthook.yml`) with automated pre-commit Biome checks and pre-push quality gates (Biome + Jest + Typecheck).
   - 12 unit tests passing in Jest (`__tests__/`).
   - `bunx expo-doctor` passed with 20/20 checks clean.
   - Metro static bundle export (`bunx expo export`) verified across iOS, Android, and Web.

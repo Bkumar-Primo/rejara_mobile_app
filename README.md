@@ -34,6 +34,8 @@ The mobile application centers around **Ask Rejara** as its primary conversation
 | **Validation** | Zod | `^4.6.7` | Runtime environment & contract validation |
 | **Secure Storage** | Expo SecureStore | `~58.0.2` | Encrypted keychain / keystore token storage |
 | **Code Quality** | ESLint & Prettier | `9.x` / `3.x` | Static analysis & code formatting |
+| **Fast Linter & Formatter** | Biome (`@biomejs/biome`) | `^2.6.4` | Sub-millisecond formatting, import organization & linting |
+| **Git Hooks Manager** | Lefthook | `^2.2.2` | Pre-commit (Biome) and pre-push (types, tests, checks) rules |
 | **Unit Testing** | Jest & Testing Library | `30.x` / `14.x` | Automated unit & contract testing |
 
 ---
@@ -130,11 +132,15 @@ rejara_mobile_app/
 | `bun run android` | Starts the app in the Android Emulator |
 | `bun run web` | Starts the app in the local Web browser |
 | `bun run typecheck` | Validates TypeScript types across the codebase (`tsc --noEmit`) |
+| `bun run check` | Runs Biome linter and format validation across the project |
+| `bun run check:fix` | Automatically fixes linting issues & formats files with Biome |
 | `bun run lint` | Runs Expo ESLint checks |
 | `bun run lint:fix` | Automatically fixes auto-fixable ESLint issues |
 | `bun run format` | Formats code with Prettier |
 | `bun run format:check` | Verifies code conforms to Prettier formatting |
 | `bun run test` | Runs Jest unit tests |
+| `bunx lefthook run pre-commit` | Runs Git pre-commit checks locally |
+| `bunx lefthook run pre-push` | Runs Git pre-push checks locally (types, tests, biome) |
 | `bunx expo-doctor` | Validates dependency compatibility and Expo configuration health |
 | `bunx expo install <pkg>` | Installs SDK-compatible packages with Bun |
 
@@ -246,24 +252,38 @@ The app supports custom URL schemes and universal linking:
 ### Running Local Development Builds
 ```bash
 # Start local Metro bundler
-npm start
+bun start
 
 # Run on iOS Simulator (macOS with Xcode)
-npm run ios
+bun run ios
 
 # Run on Android Emulator (Android Studio installed)
-npm run android
+bun run android
 ```
 
 ### Running Cloud EAS Builds
 ```bash
 # Build Android APK for testing
-npx eas-cli@latest build --platform android --profile development
+bunx eas-cli@latest build --platform android --profile development
 
 # Build iOS Simulator build for testing
-npx eas-cli@latest build --platform ios --profile development
+bunx eas-cli@latest build --platform ios --profile development
 
 # Production Build
-npx eas-cli@latest build --platform all --profile production
+bunx eas-cli@latest build --platform all --profile production
 ```
+
+---
+
+## 13. Git Hooks & Quality Enforcement (Lefthook & Biome)
+
+To enforce code quality and prevent broken code from being pushed, this repository uses **Lefthook** and **Biome**:
+
+- **Pre-commit**: Automatically runs `bunx @biomejs/biome check --write` on staged files and stages the fixes.
+- **Pre-push**: Enforces a 3-tier validation pipeline before pushing to remote:
+  1. `bun run check` (Biome formatting and lint checks)
+  2. `bun run test` (Jest test suite execution)
+  3. `bun run typecheck` (TypeScript strict compiler verification)
+
+Hooks are installed automatically on `bun install` via the `"prepare": "lefthook install"` script.
 
