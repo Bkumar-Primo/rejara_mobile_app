@@ -127,9 +127,12 @@ rejara_mobile_app/
 
 | Command | Action |
 | :--- | :--- |
-| `bun start` | Starts the Expo development server / Metro bundler |
-| `bun run ios` | Starts the app in the iOS Simulator |
-| `bun run android` | Starts the app in the Android Emulator |
+| `bun start` | Starts the Metro bundler in Development Client mode (`--dev-client`) |
+| `bun run start:go` | Starts the standard Expo Go server (fallback) |
+| `bun run ios` | Builds & runs the native app on the iOS Simulator (`expo run:ios`) |
+| `bun run android` | Builds & runs the native app on the Android Emulator (`expo run:android`) |
+| `bun run prebuild` | Executes Continuous Native Generation (`expo prebuild`) |
+| `bun run prebuild:clean` | Cleans and regenerates native `./ios` and `./android` directories |
 | `bun run web` | Starts the app in the local Web browser |
 | `bun run typecheck` | Validates TypeScript types across the codebase (`tsc --noEmit`) |
 | `bun run check` | Runs Biome linter and format validation across the project |
