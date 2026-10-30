@@ -26,3 +26,5 @@ export const DEEP_LINKS = {
   ASK_REJARA: 'rejara://ask-rejara',
   TASKS: 'rejara://tasks',
 } as const;
+
+export * from './endpoints';

@@ -4,6 +4,7 @@ import type { User } from '@/types/auth';
 export interface LoginCredentials {
   email: string;
   password: string;
+  timezone?: string;
 }
 
 export interface RegisterCredentials {
@@ -11,6 +12,7 @@ export interface RegisterCredentials {
   password: string;
   firstName?: string;
   lastName?: string;
+  timezone?: string;
 }
 
 export interface AuthSessionResponse {
@@ -21,4 +23,5 @@ export interface AuthSessionResponse {
 export interface GoogleAuthPayload {
   idToken: string;
   serverAuthCode?: string;
+  timezone?: string;
 }

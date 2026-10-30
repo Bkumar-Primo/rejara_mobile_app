@@ -19,49 +19,65 @@ export function registerUnauthorizedHandler(handler: UnauthorizedHandler): () =>
   };
 }
 
-export const apiClient: AxiosInstance = create({
-  baseURL: env.apiUrl,
-  timeout: APP_CONFIG.API_TIMEOUT_MS,
-  headers: {
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
-  },
-});
+/**
+ * Factory creating an Axios client pre-wired with Bearer token authentication
+ * and 401 unauthorized handling matching the Rejara multi-service architecture.
+ */
+export function createServiceApiClient(
+  baseURL: string,
+  timeoutMs: number = APP_CONFIG.API_TIMEOUT_MS
+): AxiosInstance {
+  const instance: AxiosInstance = create({
+    baseURL,
+    timeout: timeoutMs,
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+  });
 
-// Request interceptor: attach bearer token from secure storage
-apiClient.interceptors.request.use(
-  async (config: InternalAxiosRequestConfig) => {
-    try {
-      const token = await tokenStorage.getAccessToken();
-      if (token && config.headers) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-    } catch (err) {
-      // In case token retrieval fails, proceed without header and let server reply
-      console.warn('[ApiClient] Failed to retrieve auth token for request:', err);
-    }
-    return config;
-  },
-  error => Promise.reject(normalizeApiError(error))
-);
-
-// Response interceptor: handle 401 unauthorized & normalize errors
-apiClient.interceptors.response.use(
-  response => response,
-  async error => {
-    const normalized = normalizeApiError(error);
-
-    if (normalized.isUnauthorized && onUnauthorizedCallback) {
+  // Request interceptor: attach Bearer token from SecureStore
+  instance.interceptors.request.use(
+    async (config: InternalAxiosRequestConfig) => {
       try {
-        await onUnauthorizedCallback();
-      } catch (callbackErr) {
-        console.error('[ApiClient] Error running unauthorized callback:', callbackErr);
+        const token = await tokenStorage.getAccessToken();
+        if (token && config.headers) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+      } catch (err) {
+        console.warn('[ApiClient] Failed to retrieve auth token for request:', err);
       }
-    }
+      return config;
+    },
+    error => Promise.reject(normalizeApiError(error))
+  );
 
-    return Promise.reject(normalized);
-  }
-);
+  // Response interceptor: handle 401 unauthorized & normalize errors
+  instance.interceptors.response.use(
+    response => response,
+    async error => {
+      const normalized = normalizeApiError(error);
+
+      if (normalized.isUnauthorized && onUnauthorizedCallback) {
+        try {
+          await onUnauthorizedCallback();
+        } catch (callbackErr) {
+          console.error('[ApiClient] Error running unauthorized callback:', callbackErr);
+        }
+      }
+
+      return Promise.reject(normalized);
+    }
+  );
+
+  return instance;
+}
+
+// Core Rejara Service Clients (matching web frontend structure)
+export const apiClient: AxiosInstance = createServiceApiClient(env.apiUrl);
+export const authClient: AxiosInstance = createServiceApiClient(env.authUrl);
+export const guidanceClient: AxiosInstance = createServiceApiClient(env.guidanceUrl, 60_000);
+export const tasksClient: AxiosInstance = createServiceApiClient(env.tasksUrl);
 
 /**
  * Creates an AbortController signal helper for cancellable requests.

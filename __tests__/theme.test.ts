@@ -9,8 +9,8 @@ describe('Design System Theme Foundation', () => {
     expect(theme.shadows).toBeDefined();
   });
 
-  it('should have primary brand color set to Rejara navy', () => {
-    expect(colors.primary).toBe('#1E3A5F');
+  it('should have primary brand color set to Rejara blue (#3A6D8C)', () => {
+    expect(colors.primary).toBe('#3A6D8C');
   });
 
   it('should have standard spacing values', () => {
@@ -27,9 +27,9 @@ describe('Design System Theme Foundation', () => {
     expect(typography.body.lineHeight).toBe(24);
   });
 
-  it('should have standard radius tokens', () => {
-    expect(radius.sm).toBe(8);
-    expect(radius.md).toBe(12);
+  it('should have standard radius tokens matching web control and card tokens', () => {
+    expect(radius.control).toBe(8);
+    expect(radius.card).toBe(12);
     expect(radius.full).toBe(9999);
   });
 });
